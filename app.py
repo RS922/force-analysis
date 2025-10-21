@@ -25,11 +25,18 @@ if left_file and right_file:
         summary.append((angle, std_left, std_right))
 
         st.subheader(f"Force Over Time at Angle {angle}")
+        # Create time axis in seconds (0.1s per row)
+        max_len = max(len(left), len(right))
+        time_axis = [round(i * 0.1, 1) for i in range(max_len)]
+
         chart_data = pd.DataFrame({
-            'Left': left['left'].reset_index(drop=True),
-            'Right': right['right'].reset_index(drop=True)
+            'Time (s)': time_axis,
+            'Left': left['left'].reset_index(drop=True).reindex(range(max_len)),
+            'Right': right['right'].reset_index(drop=True).reindex(range(max_len))
         })
-        st.line_chart(chart_data)
+
+chart_data = chart_data.set_index('Time (s)')
+st.line_chart(chart_data)
 
     summary_df = pd.DataFrame(summary, columns=['Angle', 'STD Left', 'STD Right'])
     st.subheader("STD DEV by Angle")
@@ -37,3 +44,4 @@ if left_file and right_file:
 
     csv = summary_df.to_csv(index=False).encode('utf-8')
     st.download_button("Download Summary CSV", csv, "summary.csv", "text/csv")
+
