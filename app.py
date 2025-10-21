@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import matplotlib.pyplot as plt
 
+st.set_page_config(layout="wide")
 st.title("Force Plate Analysis")
 
 left_file = st.file_uploader("Upload Left Leg CSV", type="csv")
@@ -17,28 +18,19 @@ if left_file and right_file:
     summary = []
 
     for angle in sorted(set(grouped_left.groups.keys()).union(grouped_right.groups.keys())):
-        fig, ax = plt.subplots()
-        if angle in grouped_left.groups:
-            left = grouped_left.get_group(angle)
-            ax.plot(range(len(left)), left['left'], label='Left', color='blue')
-            std_left = left['left'].std()
-        else:
-            std_left = 0
+        left = grouped_left.get_group(angle) if angle in grouped_left.groups else pd.DataFrame(columns=['left'])
+        right = grouped_right.get_group(angle) if angle in grouped_right.groups else pd.DataFrame(columns=['right'])
 
-        if angle in grouped_right.groups:
-            right = grouped_right.get_group(angle)
-            ax.plot(range(len(right)), right['right'], label='Right', color='red')
-            std_right = right['right'].std()
-        else:
-            std_right = 0
-
-        ax.set_title(f'Force Over Time at Angle {angle}')
-        ax.set_xlabel('Time (row index)')
-        ax.set_ylabel('Force')
-        ax.legend()
-        st.pyplot(fig)
-
+        std_left = left['left'].std() if not left.empty else 0
+        std_right = right['right'].std() if not right.empty else 0
         summary.append((angle, std_left, std_right))
+
+        st.subheader(f"Force Over Time at Angle {angle}")
+        chart_data = pd.DataFrame({
+            'Left': left['left'].reset_index(drop=True),
+            'Right': right['right'].reset_index(drop=True)
+        })
+        st.line_chart(chart_data)
 
     summary_df = pd.DataFrame(summary, columns=['Angle', 'STD Left', 'STD Right'])
     st.subheader("STD DEV by Angle")
