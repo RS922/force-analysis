@@ -26,8 +26,8 @@ if left_file and right_file:
         st.error(f"Error reading files: {e}")
         st.stop()
 
-    grouped_left = df_left.groupby('angle')
-    grouped_right = df_right.groupby('angle')
+    grouped_left = df_left.groupby('angle' or 'Angle')
+    grouped_right = df_right.groupby('angle' or 'Angle')
 
     summary = []
 
@@ -67,4 +67,5 @@ if left_file and right_file:
 
     csv = summary_df.to_csv(index=False).encode('utf-8')
     st.download_button("Download Summary CSV", csv, "summary.csv", "text/csv")
+
 
