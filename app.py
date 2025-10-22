@@ -68,8 +68,3 @@ if left_file and right_file:
     csv = summary_df.to_csv(index=False).encode('utf-8')
     st.download_button("Download Summary CSV", csv, "summary.csv", "text/csv")
 
-    st.markdown("""
-    ---
-    **To print this page:**  
-    Use your browser’s print feature (Ctrl+P or Cmd+P) to save or print the full analysis.
-    """)
