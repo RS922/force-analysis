@@ -15,22 +15,32 @@ st.sidebar.header("Display Settings")
 chart_height = st.sidebar.slider("Chart Height (px)", min_value=200, max_value=600, value=300, step=50)
 sort_order = st.sidebar.selectbox("Sort Angles", options=["Ascending", "Descending"])
 
-left_file = st.file_uploader("Upload Left Leg CSV", type="csv")
-right_file = st.file_uploader("Upload Right Leg CSV", type="csv")
+left_file = st.file_uploader("Upload First CSV (Left Leg)", type="csv")
+right_file = st.file_uploader("Upload Second CSV (Right Leg)", type="csv")
+
+def normalize_columns(df):
+    df.columns = [col.strip().lower() for col in df.columns]
+    return df
 
 if left_file and right_file:
     try:
-        df_left = pd.read_csv(left_file)
-        df_right = pd.read_csv(right_file)
+        df_left = normalize_columns(pd.read_csv(left_file))
+        df_right = normalize_columns(pd.read_csv(right_file))
     except Exception as e:
         st.error(f"Error reading files: {e}")
         st.stop()
 
-    grouped_left = df_left.groupby('angle' or 'Angle')
-    grouped_right = df_right.groupby('angle' or 'Angle')
+    if 'angle' not in df_left.columns or 'left' not in df_left.columns:
+        st.error("First file must contain 'angle' and 'left' columns (case-insensitive).")
+        st.stop()
+    if 'angle' not in df_right.columns or 'right' not in df_right.columns:
+        st.error("Second file must contain 'angle' and 'right' columns (case-insensitive).")
+        st.stop()
+
+    grouped_left = df_left.groupby('angle')
+    grouped_right = df_right.groupby('angle')
 
     summary = []
-
     angles = sorted(set(grouped_left.groups.keys()).union(grouped_right.groups.keys()), reverse=(sort_order == "Descending"))
 
     for angle in angles:
@@ -67,5 +77,3 @@ if left_file and right_file:
 
     csv = summary_df.to_csv(index=False).encode('utf-8')
     st.download_button("Download Summary CSV", csv, "summary.csv", "text/csv")
-
-
