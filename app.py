@@ -12,7 +12,7 @@ section.main > div { max-width: 1000px; margin: auto; }
 
 # Controls
 st.sidebar.header("Display Settings")
-chart_height = st.sidebar.slider("Chart Height (px)", min_value=200, max_value=600, value=300, step=50)
+chart_height = st.sidebar.slider("Chart Height (px)", min_value=50, max_value=600, value=300, step=25)
 sort_order = st.sidebar.selectbox("Sort Angles", options=["Ascending", "Descending"])
 
 left_file = st.file_uploader("Upload First CSV (Left Leg)", type="csv")
@@ -77,3 +77,4 @@ if left_file and right_file:
 
     csv = summary_df.to_csv(index=False).encode('utf-8')
     st.download_button("Download Summary CSV", csv, "summary.csv", "text/csv")
+
