@@ -45,15 +45,15 @@ if left_file and right_file:
             'Right': right['right'].reset_index(drop=True).reindex(range(max_len))
         }).set_index('Time (s)')
 
-        st.line_chart(chart_data, height=300)
+        st.line_chart(chart_data, height=200)
 
         # Breakpoint labels (min force time)
         if not left.empty:
             bp_left = round(left['left'].idxmin() * 0.1, 1)
-            st.caption(f"🔵 Left leg breakpoint at {bp_left}s")
+            st.caption(f"Left leg breakpoint at {bp_left}s")
         if not right.empty:
             bp_right = round(right['right'].idxmin() * 0.1, 1)
-            st.caption(f"🔴 Right leg breakpoint at {bp_right}s")
+            st.caption(f"Right leg breakpoint at {bp_right}s")
 
     summary_df = pd.DataFrame(summary, columns=['Angle', 'STD Left', 'STD Right'])
     st.subheader("STD DEV by Angle")
@@ -64,6 +64,7 @@ if left_file and right_file:
 
     st.markdown("""
     ---
-    💡 **To print this page:**  
+    **To print this page:**  
     Use your browser’s print feature (Ctrl+P or Cmd+P) to save or print the full analysis.
     """)
+
